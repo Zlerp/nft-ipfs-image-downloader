@@ -1,50 +1,37 @@
-const fs = require('fs');
-const axios = require('axios');
+import Downloader from './downloader.js';
 
-// Gobz
-// QmeKYX98bWX4F7vsqoW98gWbjXKAwd5mj9cuPWfRrVuB3k
+const loopydonuts = {
+  slug: 'loopydonuts',
+  token: 'QmZrvjYcwZ4P5DMiY4Gv9T8W1Pf7DuLpqc6JSdmKxG3n6h',
+  tokenURISuffix: '.json',
+};
 
-//mfers 
-// QmWiQE65tmpYzcokCheQmng2DCM33DEhjXcPB6PanwpAZo
+const mfers = {
+  slug: 'mfers',
+  token: 'QmWiQE65tmpYzcokCheQmng2DCM33DEhjXcPB6PanwpAZo',
+  tokenURISuffix: '',
+};
 
-const ipfsURI = "https://ipfs.io/ipfs/"
-const tokenUri = ipfsURI + "QmeKYX98bWX4F7vsqoW98gWbjXKAwd5mj9cuPWfRrVuB3k/";
-const tokenCount = 99;
+const gobz = {
+  slug: 'gobz',
+  token: 'QmeKYX98bWX4F7vsqoW98gWbjXKAwd5mj9cuPWfRrVuB3k',
+  tokenURISuffix: '',
+};
 
-const download_image = async (url, image_path) => {
-  const response = await axios({
-    url,
-    responseType: 'stream',
-  })
+// change it to the nft object you want
 
-  return new Promise((resolve, reject) => {
-    response.data
-      .pipe(fs.createWriteStream("./generated/images/" + image_path))
-      .on('finish', () => resolve())
-      .on('error', e => reject(e));
-  });
+const d = new Downloader(loopydonuts);
 
-}
+// you can setDebug(true | false)
+// you can setSilent() No debug logs
+// you can setVerbose() All debug logs
+d.setVerbose();
 
-async function go() {
-  for (x = 0; x < tokenCount; x++) {
-    console.log(tokenUri + x);
-    const response = await axios.get(tokenUri + x);
-    console.log(`Token: ${x} | Status: ${response.status}`);
-    const data = response.data;
-    const imgIpfsUrl = data.image;
-    const imageAddress = imgIpfsUrl.replace('ipfs://', '');
-    const imgUrl = ipfsURI + imageAddress;
-    console.log(x, imgUrl);
-    let jsonData = JSON.stringify(data);
-    fs.writeFileSync('./generated/json/' + x + '.json', jsonData);
-    await download_image(imgUrl, x + ".png");
-  }
-}
+// fetch one item
+d.fetch(1);
 
-(async function () {
-  await go();
-})()
+// fetch a list of specific items
+// d.fetchList([3, 5, 8]);
 
-
-
+// fetch a number range
+// d.fetchRange(5, 10);
